@@ -3,6 +3,7 @@ layout: post
 title:  "Run perf, htop, eBPF BCC tools on android emulator"
 date:   2020-06-03 10:11:43 +0200
 categories: android
+excerpt: Running standard linux tools and epbf bcc on android is not an easy task. This post contains complete guide and a full bash script for that.
 ---
 
 [`eBPF`](
@@ -92,6 +93,7 @@ done
 
 
 Clone and prepare a shell environment with `adeb`. Make sure to use local mirror for debian packages. The hardcoded value is `us`.
+When the preparation is done it will be possible to install standard linux tools like htop and perf.
 
 {%- highlight bash -%}
 git clone https://github.com/joelagnel/adeb.git

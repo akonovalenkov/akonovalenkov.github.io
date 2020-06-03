@@ -1,17 +1,156 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.1">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2020-05-27T13:12:46+02:00</updated><id>/feed.xml</id><title type="html">Your awesome title</title><subtitle>Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.</subtitle><entry><title type="html">Welcome to Jekyll!</title><link href="/jekyll/update/2020/05/27/welcome-to-jekyll.html" rel="alternate" type="text/html" title="Welcome to Jekyll!" /><published>2020-05-27T13:11:43+02:00</published><updated>2020-05-27T13:11:43+02:00</updated><id>/jekyll/update/2020/05/27/welcome-to-jekyll</id><content type="html" xml:base="/jekyll/update/2020/05/27/welcome-to-jekyll.html">&lt;p&gt;You’ll find this post in your &lt;code class=&quot;highlighter-rouge&quot;&gt;_posts&lt;/code&gt; directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run &lt;code class=&quot;highlighter-rouge&quot;&gt;jekyll serve&lt;/code&gt;, which launches a web server and auto-regenerates your site when a file is updated.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-06-03T12:13:56+02:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Your awesome title</title><subtitle>Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.</subtitle><entry><title type="html">Run perf, htop, eBPF BCC tools on android emulator</title><link href="http://localhost:4000/android/2020/06/03/run-perf-htop-ebpf-bcc-tools-on-android-emulator.html" rel="alternate" type="text/html" title="Run perf, htop, eBPF BCC tools on android emulator" /><published>2020-06-03T10:11:43+02:00</published><updated>2020-06-03T10:11:43+02:00</updated><id>http://localhost:4000/android/2020/06/03/run-perf-htop-ebpf-bcc-tools-on-android-emulator</id><content type="html" xml:base="http://localhost:4000/android/2020/06/03/run-perf-htop-ebpf-bcc-tools-on-android-emulator.html">&lt;p&gt;&lt;a href=&quot;http://www.brendangregg.com/blog/2019-01-01/learn-ebpf-tracing.html&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;eBPF&lt;/code&gt;&lt;/a&gt; is a safe in-kernel virtual machine which can be used to trace interactions between user space programs and linux kernel.&lt;/p&gt;
 
-&lt;p&gt;Jekyll requires blog post files to be named according to the following format:&lt;/p&gt;
+&lt;p&gt;The main advatage of &lt;code class=&quot;highlighter-rouge&quot;&gt;eBPF&lt;/code&gt; over existing tools like &lt;code class=&quot;highlighter-rouge&quot;&gt;strace&lt;/code&gt; or &lt;code class=&quot;highlighter-rouge&quot;&gt;perf trace&lt;/code&gt; is low overhead. Since the &lt;code class=&quot;highlighter-rouge&quot;&gt;eBPF&lt;/code&gt; instructions run in kernel there is no raw data transfer between user space and kernel.&lt;/p&gt;
 
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;YEAR-MONTH-DAY-title.MARKUP&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;eBPF is too low level to use directly, so a tooling was built around it - &lt;a href=&quot;https://github.com/iovisor/bcc&quot;&gt;BCC&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;Where &lt;code class=&quot;highlighter-rouge&quot;&gt;YEAR&lt;/code&gt; is a four-digit number, &lt;code class=&quot;highlighter-rouge&quot;&gt;MONTH&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;DAY&lt;/code&gt; are both two-digit numbers, and &lt;code class=&quot;highlighter-rouge&quot;&gt;MARKUP&lt;/code&gt; is the file extension representing the format used in the file. After that, include the necessary front matter. Take a look at the source for this post to get an idea about how it works.&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;BCC is a toolkit for creating efficient kernel tracing and manipulation programs, and includes several useful tools and examples. It makes use of extended BPF (Berkeley Packet Filters), formally known as eBPF&lt;/p&gt;
+&lt;/blockquote&gt;
 
-&lt;p&gt;Jekyll also offers powerful support for code snippets:&lt;/p&gt;
+&lt;p&gt;This post will show how to run linux standard tools and &lt;code class=&quot;highlighter-rouge&quot;&gt;BCC&lt;/code&gt; tools on an android emulator.&lt;/p&gt;
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;print_hi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-  &lt;span class=&quot;nb&quot;&gt;puts&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Hi, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;print_hi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'Tom'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;#=&amp;gt; prints 'Hi, Tom' to STDOUT.&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;p&gt;To run linux tools on android we need to create a linux environment. There is a project called &lt;a href=&quot;https://github.com/joelagnel/adeb&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;adeb&lt;/code&gt;&lt;/a&gt; which does exactly that.&lt;/p&gt;
 
-&lt;p&gt;Check out the &lt;a href=&quot;https://jekyllrb.com/docs/home&quot;&gt;Jekyll docs&lt;/a&gt; for more info on how to get the most out of Jekyll. File all bugs/feature requests at &lt;a href=&quot;https://github.com/jekyll/jekyll&quot;&gt;Jekyll’s GitHub repo&lt;/a&gt;. If you have questions, you can ask them on &lt;a href=&quot;https://talk.jekyllrb.com/&quot;&gt;Jekyll Talk&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">You’ll find this post in your _posts directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run jekyll serve, which launches a web server and auto-regenerates your site when a file is updated.</summary></entry></feed>
+&lt;p&gt;But if you clone &lt;code class=&quot;highlighter-rouge&quot;&gt;adeb&lt;/code&gt;, follow all the instructions and try to run a bcc tool, you might get an error like following:&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;root@localhost:/usr/share/bcc/tools# &lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; /usr/share/bcc/tools/
+root@localhost:/usr/share/bcc/tools# ./opensnoop
+libbpf: failed to find valid kernel BTF
+libbpf: vmlinux BTF is not found
+sh: modprobe: &lt;span class=&quot;nb&quot;&gt;command &lt;/span&gt;not found
+Unable to find kernel headers. Try rebuilding kernel with &lt;span class=&quot;nv&quot;&gt;CONFIG_IKHEADERS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;m &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;module&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+chdir&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;/lib/modules/4.14.112+/build&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;: No such file or directory
+Traceback &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;most recent call last&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;:
+  File &lt;span class=&quot;s2&quot;&gt;&quot;./opensnoop&quot;&lt;/span&gt;, line 236, &lt;span class=&quot;k&quot;&gt;in&lt;/span&gt; &amp;lt;module&amp;gt;
+    b &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; BPF&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;text&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;bpf_text&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+  File &lt;span class=&quot;s2&quot;&gt;&quot;/usr/lib/python2.7/dist-packages/bcc/__init__.py&quot;&lt;/span&gt;, line 357, &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;__init__
+    raise Exception&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Failed to compile BPF module %s&quot;&lt;/span&gt; % &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;src_file or &lt;span class=&quot;s2&quot;&gt;&quot;&amp;lt;text&amp;gt;&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt;
+Exception: Failed to compile BPF module &amp;lt;text&amp;gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;p&gt;Let’s check what is going on:&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;root@localhost:/usr/share/bcc/tools# strace &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; ./opensnoop
+&lt;span class=&quot;c&quot;&gt;# ...&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;stat&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;/tmp/kheaders-4.14.112+&quot;&lt;/span&gt;, 0x7fff0fca6130&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; ENOENT &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;No such file or directory&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;stat&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;/sys/kernel/kheaders.tar.xz&quot;&lt;/span&gt;, 0x7fff0fca60a0&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; ENOENT &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;No such file or directory&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;pid  3623] execve&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;/bin/sh&quot;&lt;/span&gt;, &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;sh&quot;&lt;/span&gt;, &lt;span class=&quot;s2&quot;&gt;&quot;-c&quot;&lt;/span&gt;, &lt;span class=&quot;s2&quot;&gt;&quot;modprobe kheaders&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;, 0x7fff0fca7a00 /&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt; 26 vars &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;/&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; 0
+&lt;span class=&quot;c&quot;&gt;# ...&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;p&gt;It tries to find kernel headers and gets &lt;code class=&quot;highlighter-rouge&quot;&gt;-1&lt;/code&gt; meaning that the headers are not found. Then it tries to manually load a kernel module called &lt;code class=&quot;highlighter-rouge&quot;&gt;kheaders&lt;/code&gt;. But neither &lt;code class=&quot;highlighter-rouge&quot;&gt;modprobe&lt;/code&gt; is found on &lt;code class=&quot;highlighter-rouge&quot;&gt;$PATH&lt;/code&gt;, no kheaders module exists.&lt;/p&gt;
+
+&lt;p&gt;We need to build a linux kernel with kheaders module. If you don’t want to bother with the go through process - just jump straight to the &lt;a href=&quot;#the-script&quot;&gt;script&lt;/a&gt; down the page.&lt;/p&gt;
+
+&lt;p&gt;Clone and prepare required prebuilts:&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/x86/x86_64-linux-android-4.9
+&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;x86_64-linux-android-4.9
+git checkout pie-b4s4-release
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;PATH&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$PATH&lt;/span&gt;:&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;pwd&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;/bin
+&lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; ..&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;p&gt;Clone and build a linux kernel with &lt;code class=&quot;highlighter-rouge&quot;&gt;CONFIG_IKHEADERS&lt;/code&gt; support. Thanks Mr. Ayrx on github.&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;git clone https://github.com/akonovalenkov/android-goldfish.git
+&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;android-goldfish
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;CROSS_COMPILE&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;x86_64-linux-android-
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;ARCH&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;x86_64
+make x86_64_ranchu_defconfig
+&lt;span class=&quot;nb&quot;&gt;echo &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;CONFIG_IKHEADERS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;m &lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; .config
+make &lt;span class=&quot;nt&quot;&gt;-j&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;nproc&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--all&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; ..&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;p&gt;Prepare and run an emulator (assumed android sdk installed), specifying the newly built kernel:&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;sdkmanager &lt;span class=&quot;nt&quot;&gt;--install&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;system-images;android-29;default;x86_64&quot;&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;no&quot;&lt;/span&gt; | avdmanager create avd &lt;span class=&quot;nt&quot;&gt;--name&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;test-bcc&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--package&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;system-images;android-29;default;x86_64&quot;&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;nohup &lt;/span&gt;emulator @test-bcc &lt;span class=&quot;nt&quot;&gt;-partition-size&lt;/span&gt; 5120 &lt;span class=&quot;nt&quot;&gt;-kernel&lt;/span&gt; ./android-goldfish/arch/x86/boot/bzImage &amp;amp;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;p&gt;It’s a good idea to warm up &lt;code class=&quot;highlighter-rouge&quot;&gt;adb root&lt;/code&gt; before going to the next step:&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;k&quot;&gt;until &lt;/span&gt;adb root
+&lt;span class=&quot;k&quot;&gt;do
+    &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo &lt;/span&gt;waiting &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;adb root...
+    &lt;span class=&quot;nb&quot;&gt;sleep &lt;/span&gt;1
+&lt;span class=&quot;k&quot;&gt;done&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;p&gt;Clone and prepare a shell environment with &lt;code class=&quot;highlighter-rouge&quot;&gt;adeb&lt;/code&gt;. Make sure to use local mirror for debian packages. The hardcoded value is &lt;code class=&quot;highlighter-rouge&quot;&gt;us&lt;/code&gt;.&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;git clone https://github.com/joelagnel/adeb.git
+&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;adeb
+&lt;span class=&quot;nb&quot;&gt;sed&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-i&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'s/ftp.us.debian.org/ftp.se.debian.org/g'&lt;/span&gt; buildstrap
+./adeb prepare &lt;span class=&quot;nt&quot;&gt;--bcc&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--build&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--arch&lt;/span&gt; amd64
+&lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; ..&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;p&gt;Push &lt;code class=&quot;highlighter-rouge&quot;&gt;kheaders.ko&lt;/code&gt; kernel module to the emulator and install it:&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;adb push android-goldfish/kernel/kheaders.ko /data
+adb shell insmod /data/kheaders.ko&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;p&gt;We have to install &lt;code class=&quot;highlighter-rouge&quot;&gt;xz-utils&lt;/code&gt; package on the emulator. In my experience there might be several transient errors like DNS or other network related problems, so let’s add some retry logic:&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; ./adeb
+&lt;span class=&quot;k&quot;&gt;until&lt;/span&gt; ./adeb shell apt update
+&lt;span class=&quot;k&quot;&gt;do
+    &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo &lt;/span&gt;trying apt update...
+    &lt;span class=&quot;nb&quot;&gt;sleep &lt;/span&gt;1
+&lt;span class=&quot;k&quot;&gt;done
+until&lt;/span&gt; ./adeb shell apt &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;xz-utils
+&lt;span class=&quot;k&quot;&gt;do
+    &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo &lt;/span&gt;trying installing requred packages...
+    &lt;span class=&quot;nb&quot;&gt;sleep &lt;/span&gt;1
+&lt;span class=&quot;k&quot;&gt;done&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;p&gt;And eventually we can run &lt;code class=&quot;highlighter-rouge&quot;&gt;BCC&lt;/code&gt; tools:&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;./adeb shell /usr/share/bcc/tools/syscount &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; 5
+Tracing syscalls, printing top 10... Ctrl+C to quit.
+
+SYSCALL                   COUNT
+clock_gettime              8467
+futex                      4747
+ioctl                      1448
+recvfrom                   1221
+&lt;span class=&quot;nb&quot;&gt;read                       &lt;/span&gt;1024
+epoll_pwait                 909
+write                       558
+sendto                      509
+getuid                      352
+nanosleep                   281
+
+Detaching...&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;h2 id=&quot;the-script&quot;&gt;The script&lt;/h2&gt;
+
+&lt;p&gt;Make sure to use your local mirror for debian packages.&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;c&quot;&gt;#!/usr/bin/env bash&lt;/span&gt;
+
+git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/x86/x86_64-linux-android-4.9
+&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;x86_64-linux-android-4.9
+git checkout pie-b4s4-release
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;PATH&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$PATH&lt;/span&gt;:&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;pwd&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;/bin
+&lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; ..
+
+git clone https://github.com/akonovalenkov/android-goldfish.git
+&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;android-goldfish
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;CROSS_COMPILE&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;x86_64-linux-android-
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;ARCH&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;x86_64
+make x86_64_ranchu_defconfig
+&lt;span class=&quot;nb&quot;&gt;echo &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;CONFIG_IKHEADERS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;m &lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; .config
+make &lt;span class=&quot;nt&quot;&gt;-j&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;nproc&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--all&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; ..
+
+sdkmanager &lt;span class=&quot;nt&quot;&gt;--install&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;system-images;android-29;default;x86_64&quot;&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;no&quot;&lt;/span&gt; | avdmanager create avd &lt;span class=&quot;nt&quot;&gt;--name&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;test-bcc&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--package&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;system-images;android-29;default;x86_64&quot;&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;nohup &lt;/span&gt;emulator @test-bcc &lt;span class=&quot;nt&quot;&gt;-partition-size&lt;/span&gt; 5120 &lt;span class=&quot;nt&quot;&gt;-kernel&lt;/span&gt; ./android-goldfish/arch/x86/boot/bzImage &amp;amp;
+
+&lt;span class=&quot;k&quot;&gt;until &lt;/span&gt;adb root
+&lt;span class=&quot;k&quot;&gt;do
+    &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo &lt;/span&gt;waiting &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;adb root...
+    &lt;span class=&quot;nb&quot;&gt;sleep &lt;/span&gt;1
+&lt;span class=&quot;k&quot;&gt;done
+
+&lt;/span&gt;git clone https://github.com/joelagnel/adeb.git
+&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;adeb
+&lt;span class=&quot;nb&quot;&gt;sed&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-i&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'s/ftp.us.debian.org/ftp.se.debian.org/g'&lt;/span&gt; buildstrap
+./adeb prepare &lt;span class=&quot;nt&quot;&gt;--bcc&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--build&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--arch&lt;/span&gt; amd64
+
+&lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; ..
+adb push android-goldfish/kernel/kheaders.ko /data
+adb shell insmod /data/kheaders.ko
+
+&lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; ./adeb
+
+&lt;span class=&quot;k&quot;&gt;until&lt;/span&gt; ./adeb shell apt update
+&lt;span class=&quot;k&quot;&gt;do
+    &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo &lt;/span&gt;trying apt update...
+    &lt;span class=&quot;nb&quot;&gt;sleep &lt;/span&gt;1
+&lt;span class=&quot;k&quot;&gt;done
+
+until&lt;/span&gt; ./adeb shell apt &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;xz-utils
+&lt;span class=&quot;k&quot;&gt;do
+    &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo &lt;/span&gt;trying installing requred packages...
+    &lt;span class=&quot;nb&quot;&gt;sleep &lt;/span&gt;1
+&lt;span class=&quot;k&quot;&gt;done&lt;/span&gt;
+
+./adeb shell /usr/share/bcc/tools/syscount &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; 5&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;</content><author><name></name></author><summary type="html">eBPF is a safe in-kernel virtual machine which can be used to trace interactions between user space programs and linux kernel.</summary></entry></feed>

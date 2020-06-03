@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Run perf, htop, eBPF BCC tools on android emulator | Your awesome title</title>
+<meta name="generator" content="Jekyll v4.0.1" />
+<meta property="og:title" content="Run perf, htop, eBPF BCC tools on android emulator" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="eBPF is a safe in-kernel virtual machine which can be used to trace interactions between user space programs and linux kernel." />
+<meta property="og:description" content="eBPF is a safe in-kernel virtual machine which can be used to trace interactions between user space programs and linux kernel." />
+<link rel="canonical" href="http://localhost:4000/android/2020/06/03/run-perf-htop-ebpf-bcc-tools-on-android-emulator.html" />
+<meta property="og:url" content="http://localhost:4000/android/2020/06/03/run-perf-htop-ebpf-bcc-tools-on-android-emulator.html" />
+<meta property="og:site_name" content="Your awesome title" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-06-03T10:11:43+02:00" />
+<script type="application/ld+json">
+{"datePublished":"2020-06-03T10:11:43+02:00","description":"eBPF is a safe in-kernel virtual machine which can be used to trace interactions between user space programs and linux kernel.","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/android/2020/06/03/run-perf-htop-ebpf-bcc-tools-on-android-emulator.html"},"dateModified":"2020-06-03T10:11:43+02:00","@type":"BlogPosting","url":"http://localhost:4000/android/2020/06/03/run-perf-htop-ebpf-bcc-tools-on-android-emulator.html","headline":"Run perf, htop, eBPF BCC tools on android emulator","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Your awesome title" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Your awesome title</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Run perf, htop, eBPF BCC tools on android emulator</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2020-06-03T10:11:43+02:00" itemprop="datePublished">Jun 3, 2020
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p><a href="http://www.brendangregg.com/blog/2019-01-01/learn-ebpf-tracing.html"><code class="highlighter-rouge">eBPF</code></a> is a safe in-kernel virtual machine which can be used to trace interactions between user space programs and linux kernel.</p>
+
+<p>The main advatage of <code class="highlighter-rouge">eBPF</code> over existing tools like <code class="highlighter-rouge">strace</code> or <code class="highlighter-rouge">perf trace</code> is low overhead. Since the <code class="highlighter-rouge">eBPF</code> instructions run in kernel there is no raw data transfer between user space and kernel.</p>
+
+<p>eBPF is too low level to use directly, so a tooling was built around it - <a href="https://github.com/iovisor/bcc">BCC</a>.</p>
+
+<blockquote>
+  <p>BCC is a toolkit for creating efficient kernel tracing and manipulation programs, and includes several useful tools and examples. It makes use of extended BPF (Berkeley Packet Filters), formally known as eBPF</p>
+</blockquote>
+
+<p>This post will show how to run linux standard tools and <code class="highlighter-rouge">BCC</code> tools on an android emulator.</p>
+
+<p>To run linux tools on android we need to create a linux environment. There is a project called <a href="https://github.com/joelagnel/adeb"><code class="highlighter-rouge">adeb</code></a> which does exactly that.</p>
+
+<p>But if you clone <code class="highlighter-rouge">adeb</code>, follow all the instructions and try to run a bcc tool, you might get an error like following:</p>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">root@localhost:/usr/share/bcc/tools# <span class="nb">cd</span> /usr/share/bcc/tools/
+root@localhost:/usr/share/bcc/tools# ./opensnoop
+libbpf: failed to find valid kernel BTF
+libbpf: vmlinux BTF is not found
+sh: modprobe: <span class="nb">command </span>not found
+Unable to find kernel headers. Try rebuilding kernel with <span class="nv">CONFIG_IKHEADERS</span><span class="o">=</span>m <span class="o">(</span>module<span class="o">)</span>
+chdir<span class="o">(</span>/lib/modules/4.14.112+/build<span class="o">)</span>: No such file or directory
+Traceback <span class="o">(</span>most recent call last<span class="o">)</span>:
+  File <span class="s2">"./opensnoop"</span>, line 236, <span class="k">in</span> &lt;module&gt;
+    b <span class="o">=</span> BPF<span class="o">(</span><span class="nv">text</span><span class="o">=</span>bpf_text<span class="o">)</span>
+  File <span class="s2">"/usr/lib/python2.7/dist-packages/bcc/__init__.py"</span>, line 357, <span class="k">in </span>__init__
+    raise Exception<span class="o">(</span><span class="s2">"Failed to compile BPF module %s"</span> % <span class="o">(</span>src_file or <span class="s2">"&lt;text&gt;"</span><span class="o">))</span>
+Exception: Failed to compile BPF module &lt;text&gt;</code></pre></figure>
+<p>Let’s check what is going on:</p>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">root@localhost:/usr/share/bcc/tools# strace <span class="nt">-f</span> ./opensnoop
+<span class="c"># ...</span>
+<span class="nb">stat</span><span class="o">(</span><span class="s2">"/tmp/kheaders-4.14.112+"</span>, 0x7fff0fca6130<span class="o">)</span> <span class="o">=</span> <span class="nt">-1</span> ENOENT <span class="o">(</span>No such file or directory<span class="o">)</span>
+<span class="nb">stat</span><span class="o">(</span><span class="s2">"/sys/kernel/kheaders.tar.xz"</span>, 0x7fff0fca60a0<span class="o">)</span> <span class="o">=</span> <span class="nt">-1</span> ENOENT <span class="o">(</span>No such file or directory<span class="o">)</span>
+<span class="o">[</span>pid  3623] execve<span class="o">(</span><span class="s2">"/bin/sh"</span>, <span class="o">[</span><span class="s2">"sh"</span>, <span class="s2">"-c"</span>, <span class="s2">"modprobe kheaders"</span><span class="o">]</span>, 0x7fff0fca7a00 /<span class="k">*</span> 26 vars <span class="k">*</span>/<span class="o">)</span> <span class="o">=</span> 0
+<span class="c"># ...</span></code></pre></figure>
+<p>It tries to find kernel headers and gets <code class="highlighter-rouge">-1</code> meaning that the headers are not found. Then it tries to manually load a kernel module called <code class="highlighter-rouge">kheaders</code>. But neither <code class="highlighter-rouge">modprobe</code> is found on <code class="highlighter-rouge">$PATH</code>, no kheaders module exists.</p>
+
+<p>We need to build a linux kernel with kheaders module. If you don’t want to bother with the go through process - just jump straight to the <a href="#the-script">script</a> down the page.</p>
+
+<p>Clone and prepare required prebuilts:</p>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/x86/x86_64-linux-android-4.9
+<span class="nb">cd </span>x86_64-linux-android-4.9
+git checkout pie-b4s4-release
+<span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:<span class="si">$(</span><span class="nb">pwd</span><span class="si">)</span>/bin
+<span class="nb">cd</span> ..</code></pre></figure>
+<p>Clone and build a linux kernel with <code class="highlighter-rouge">CONFIG_IKHEADERS</code> support. Thanks Mr. Ayrx on github.</p>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">git clone https://github.com/akonovalenkov/android-goldfish.git
+<span class="nb">cd </span>android-goldfish
+<span class="nb">export </span><span class="nv">CROSS_COMPILE</span><span class="o">=</span>x86_64-linux-android-
+<span class="nb">export </span><span class="nv">ARCH</span><span class="o">=</span>x86_64
+make x86_64_ranchu_defconfig
+<span class="nb">echo </span><span class="nv">CONFIG_IKHEADERS</span><span class="o">=</span>m <span class="o">&gt;&gt;</span> .config
+make <span class="nt">-j</span><span class="si">$(</span><span class="nb">nproc</span> <span class="nt">--all</span><span class="si">)</span>
+<span class="nb">cd</span> ..</code></pre></figure>
+<p>Prepare and run an emulator (assumed android sdk installed), specifying the newly built kernel:</p>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">sdkmanager <span class="nt">--install</span> <span class="s2">"system-images;android-29;default;x86_64"</span>
+<span class="nb">echo</span> <span class="s2">"no"</span> | avdmanager create avd <span class="nt">--name</span> <span class="s2">"test-bcc"</span> <span class="nt">--package</span> <span class="s2">"system-images;android-29;default;x86_64"</span>
+<span class="nb">nohup </span>emulator @test-bcc <span class="nt">-partition-size</span> 5120 <span class="nt">-kernel</span> ./android-goldfish/arch/x86/boot/bzImage &amp;</code></pre></figure>
+<p>It’s a good idea to warm up <code class="highlighter-rouge">adb root</code> before going to the next step:</p>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="k">until </span>adb root
+<span class="k">do
+    </span><span class="nb">echo </span>waiting <span class="k">for </span>adb root...
+    <span class="nb">sleep </span>1
+<span class="k">done</span></code></pre></figure>
+<p>Clone and prepare a shell environment with <code class="highlighter-rouge">adeb</code>. Make sure to use local mirror for debian packages. The hardcoded value is <code class="highlighter-rouge">us</code>.</p>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">git clone https://github.com/joelagnel/adeb.git
+<span class="nb">cd </span>adeb
+<span class="nb">sed</span> <span class="nt">-i</span> <span class="s1">'s/ftp.us.debian.org/ftp.se.debian.org/g'</span> buildstrap
+./adeb prepare <span class="nt">--bcc</span> <span class="nt">--build</span> <span class="nt">--arch</span> amd64
+<span class="nb">cd</span> ..</code></pre></figure>
+<p>Push <code class="highlighter-rouge">kheaders.ko</code> kernel module to the emulator and install it:</p>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">adb push android-goldfish/kernel/kheaders.ko /data
+adb shell insmod /data/kheaders.ko</code></pre></figure>
+<p>We have to install <code class="highlighter-rouge">xz-utils</code> package on the emulator. In my experience there might be several transient errors like DNS or other network related problems, so let’s add some retry logic:</p>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nb">cd</span> ./adeb
+<span class="k">until</span> ./adeb shell apt update
+<span class="k">do
+    </span><span class="nb">echo </span>trying apt update...
+    <span class="nb">sleep </span>1
+<span class="k">done
+until</span> ./adeb shell apt <span class="nb">install </span>xz-utils
+<span class="k">do
+    </span><span class="nb">echo </span>trying installing requred packages...
+    <span class="nb">sleep </span>1
+<span class="k">done</span></code></pre></figure>
+<p>And eventually we can run <code class="highlighter-rouge">BCC</code> tools:</p>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">./adeb shell /usr/share/bcc/tools/syscount <span class="nt">-d</span> 5
+Tracing syscalls, printing top 10... Ctrl+C to quit.
+
+SYSCALL                   COUNT
+clock_gettime              8467
+futex                      4747
+ioctl                      1448
+recvfrom                   1221
+<span class="nb">read                       </span>1024
+epoll_pwait                 909
+write                       558
+sendto                      509
+getuid                      352
+nanosleep                   281
+
+Detaching...</code></pre></figure>
+<h2 id="the-script">The script</h2>
+
+<p>Make sure to use your local mirror for debian packages.</p>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c">#!/usr/bin/env bash</span>
+
+git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/x86/x86_64-linux-android-4.9
+<span class="nb">cd </span>x86_64-linux-android-4.9
+git checkout pie-b4s4-release
+<span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:<span class="si">$(</span><span class="nb">pwd</span><span class="si">)</span>/bin
+<span class="nb">cd</span> ..
+
+git clone https://github.com/akonovalenkov/android-goldfish.git
+<span class="nb">cd </span>android-goldfish
+<span class="nb">export </span><span class="nv">CROSS_COMPILE</span><span class="o">=</span>x86_64-linux-android-
+<span class="nb">export </span><span class="nv">ARCH</span><span class="o">=</span>x86_64
+make x86_64_ranchu_defconfig
+<span class="nb">echo </span><span class="nv">CONFIG_IKHEADERS</span><span class="o">=</span>m <span class="o">&gt;&gt;</span> .config
+make <span class="nt">-j</span><span class="si">$(</span><span class="nb">nproc</span> <span class="nt">--all</span><span class="si">)</span>
+<span class="nb">cd</span> ..
+
+sdkmanager <span class="nt">--install</span> <span class="s2">"system-images;android-29;default;x86_64"</span>
+<span class="nb">echo</span> <span class="s2">"no"</span> | avdmanager create avd <span class="nt">--name</span> <span class="s2">"test-bcc"</span> <span class="nt">--package</span> <span class="s2">"system-images;android-29;default;x86_64"</span>
+<span class="nb">nohup </span>emulator @test-bcc <span class="nt">-partition-size</span> 5120 <span class="nt">-kernel</span> ./android-goldfish/arch/x86/boot/bzImage &amp;
+
+<span class="k">until </span>adb root
+<span class="k">do
+    </span><span class="nb">echo </span>waiting <span class="k">for </span>adb root...
+    <span class="nb">sleep </span>1
+<span class="k">done
+
+</span>git clone https://github.com/joelagnel/adeb.git
+<span class="nb">cd </span>adeb
+<span class="nb">sed</span> <span class="nt">-i</span> <span class="s1">'s/ftp.us.debian.org/ftp.se.debian.org/g'</span> buildstrap
+./adeb prepare <span class="nt">--bcc</span> <span class="nt">--build</span> <span class="nt">--arch</span> amd64
+
+<span class="nb">cd</span> ..
+adb push android-goldfish/kernel/kheaders.ko /data
+adb shell insmod /data/kheaders.ko
+
+<span class="nb">cd</span> ./adeb
+
+<span class="k">until</span> ./adeb shell apt update
+<span class="k">do
+    </span><span class="nb">echo </span>trying apt update...
+    <span class="nb">sleep </span>1
+<span class="k">done
+
+until</span> ./adeb shell apt <span class="nb">install </span>xz-utils
+<span class="k">do
+    </span><span class="nb">echo </span>trying installing requred packages...
+    <span class="nb">sleep </span>1
+<span class="k">done</span>
+
+./adeb shell /usr/share/bcc/tools/syscount <span class="nt">-d</span> 5</code></pre></figure>
+
+  </div><a class="u-url" href="/android/2020/06/03/run-perf-htop-ebpf-bcc-tools-on-android-emulator.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Your awesome title</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Your awesome title</li><li><a class="u-email" href="mailto:your-email@example.com">your-email@example.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/jekyll"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">jekyll</span></a></li><li><a href="https://www.twitter.com/jekyllrb"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">jekyllrb</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

@@ -21,7 +21,7 @@
 title: Making Software
 email: artem.konovalenkov@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
-    Hi, my name is Artem konovalenkov and I have been a software engineer for 10+ years. In this blog I will share my experience.
+    Hi, my name is Artem konovalenkov and I have been a software engineer for 10+ years. Here I am writing about making software.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 # twitter_username: jekyllrb
